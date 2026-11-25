@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What's for dinner?</title>
+<meta name="description" content="Pick what's in your fridge and pantry and get dinner ideas you can make tonight.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+/* ---------- Theme tokens ---------- */
+:root, :root[data-theme="tomato"] {
+  color-scheme: light;
+  --bg:#FFF0EC; --surface:#FFFFFF; --surface-2:#FFE0D7; --ink:#2A1714; --muted:#76544D; --line:#F0C4B8;
+  --accent:#D13A25; --on-accent:#FFFFFF; --accent-2:#1F8F81;
+  --m1:#D13A25; --m1-ink:#FFFFFF; --m2:#FFB020; --m2-ink:#2A1714; --m3:#1F8F81; --m3-ink:#FFFFFF;
+  --m4:#6C5CE7; --m4-ink:#FFFFFF; --m5:#FF8FBE; --m5-ink:#2A1714;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg:#15131F; --surface:#1F1C2E; --surface-2:#2A2640; --ink:#F4F1FF; --muted:#ABA5C9; --line:#3A3454;
+    --accent:#FF6FA8; --on-accent:#1A0E14; --accent-2:#4FD1C5;
+    --m1:#FF6FA8; --m1-ink:#1A0E14; --m2:#FFD166; --m2-ink:#1A0E14; --m3:#4FD1C5; --m3-ink:#0D1F1D;
+    --m4:#9B8CFF; --m4-ink:#120E2A; --m5:#FF8A5B; --m5-ink:#1A0E14;
+  }
+}
+:root[data-theme="avocado"] {
+  color-scheme: light;
+  --bg:#F0F7E9; --surface:#FFFFFF; --surface-2:#DCEDCC; --ink:#1D2B14; --muted:#56694A; --line:#C3DBAE;
+  --accent:#2F7A22; --on-accent:#FFFFFF; --accent-2:#C26A1B;
+  --m1:#2F7A22; --m1-ink:#FFFFFF; --m2:#F2C14E; --m2-ink:#1D2B14; --m3:#A4C639; --m3-ink:#1D2B14;
+  --m4:#7C4D2A; --m4-ink:#FFFFFF; --m5:#E98A3B; --m5-ink:#1D2B14;
+}
+:root[data-theme="blueberry"] {
+  color-scheme: light;
+  --bg:#F0EFFF; --surface:#FFFFFF; --surface-2:#DFDBFF; --ink:#17143A; --muted:#5A5683; --line:#CBC6F3;
+  --accent:#5B3FD9; --on-accent:#FFFFFF; --accent-2:#E8457A;
+  --m1:#5B3FD9; --m1-ink:#FFFFFF; --m2:#FFB347; --m2-ink:#17143A; --m3:#19B5A5; --m3-ink:#0B2A27;
+  --m4:#2563EB; --m4-ink:#FFFFFF; --m5:#FF7AA0; --m5-ink:#17143A;
+}
+:root[data-theme="mango"] {
+  color-scheme: light;
+  --bg:#FFF7E0; --surface:#FFFFFF; --surface-2:#FFEAB0; --ink:#2E2205; --muted:#735E26; --line:#F2D88A;
+  --accent:#F28C00; --on-accent:#2E2205; --accent-2:#D6336C;
+  --m1:#F28C00; --m1-ink:#2E2205; --m2:#FFC93C; --m2-ink:#2E2205; --m3:#1E8A3F; --m3-ink:#FFFFFF;
+  --m4:#2F6FE0; --m4-ink:#FFFFFF; --m5:#D6336C; --m5-ink:#FFFFFF;
+}
+:root[data-theme="midnight"] {
+  color-scheme: dark;
+  --bg:#15131F; --surface:#1F1C2E; --surface-2:#2A2640; --ink:#F4F1FF; --muted:#ABA5C9; --line:#3A3454;
+  --accent:#FF6FA8; --on-accent:#1A0E14; --accent-2:#4FD1C5;
+  --m1:#FF6FA8; --m1-ink:#1A0E14; --m2:#FFD166; --m2-ink:#1A0E14; --m3:#4FD1C5; --m3-ink:#0D1F1D;
+  --m4:#9B8CFF; --m4-ink:#120E2A; --m5:#FF8A5B; --m5-ink:#1A0E14;
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: "Bricolage Grotesque", ui-rounded, "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 17px; line-height: 1.5;
+  transition: background-color .3s ease, color .3s ease;
+}
+img { max-width: 100%; display: block; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 2px; border-radius: 10px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Header ---------- */
+.top {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 20px 10px;
+  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 19px; text-decoration: none; letter-spacing: -0.01em; }
+.icon-btn {
+  position: relative; width: 44px; height: 44px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 50%; border: 2px solid var(--line); background: var(--surface);
+}
+.icon-btn svg { width: 22px; height: 22px; }
+.icon-btn.small { width: 36px; height: 36px; border-width: 1.5px; font-size: 18px; }
+.count {
+  position: absolute; top: -4px; right: -4px; min-width: 20px; height: 20px; padding: 0 5px;
+  border-radius: 10px; background: var(--accent); color: var(--on-accent);
+  font-size: 12px; font-weight: 800; line-height: 20px; text-align: center;
+}
+.count[hidden] { display: none; }
+
+/* ---------- Hero ---------- */
+.hero { padding: 28px 0 22px; }
+.hero h1 {
+  margin: 0; font-weight: 800; font-size: clamp(2.6rem, 7.5vw, 5.2rem);
+  line-height: .95; letter-spacing: -0.035em; font-variation-settings: "opsz" 96;
+  max-width: 12ch;
+}
+.lede { margin: 16px 0 0; color: var(--muted); font-size: 18px; max-width: 46ch; }
+
+/* ---------- Fridge door ---------- */
+.fridge {
+  position: relative; background: var(--surface-2); border-radius: 28px;
+  padding: 20px 46px 24px 22px; border: 2px solid var(--line); min-height: 150px;
+}
+.fridge::after {
+  content: ""; position: absolute; right: 16px; top: 28px; width: 9px; height: 74px;
+  border-radius: 9px; background: var(--line);
+}
+.fridge-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.fridge-head h2 { margin: 0; font-size: 20px; font-weight: 800; }
+.fridge-head .n { color: var(--muted); font-weight: 600; }
+.text-btn { background: none; border: 0; padding: 6px 4px; color: var(--muted); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.text-btn[hidden] { display: none; }
+.magnets { display: flex; flex-wrap: wrap; gap: 12px 10px; }
+.magnet {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 12px 9px 13px; border: 0; border-radius: 14px;
+  background: var(--mc); color: var(--mi); font-weight: 600; font-size: 16px;
+  transform: rotate(var(--tilt, 0deg));
+  box-shadow: 0 3px 0 rgb(0 0 0 / .22), 0 10px 16px -10px rgb(0 0 0 / .45);
+}
+.magnet .x { opacity: .7; font-size: 18px; line-height: 1; margin-left: 2px; }
+.magnet.pop { animation: stick .35s cubic-bezier(.3,1.6,.5,1); }
+@keyframes stick { from { transform: rotate(var(--tilt)) translateY(-14px) scale(1.15); } to { transform: rotate(var(--tilt)); } }
+.fridge-empty { margin: 4px 0 0; color: var(--muted); max-width: 40ch; }
+
+/* ---------- Picker ---------- */
+.picker { padding: 26px 0 8px; }
+.search {
+  display: flex; align-items: center; gap: 10px; max-width: 520px;
+  background: var(--surface); border: 2px solid var(--line); border-radius: 999px; padding: 0 18px;
+}
+.search:focus-within { border-color: var(--accent); }
+.search svg { width: 20px; height: 20px; flex: none; color: var(--muted); }
+.search input { flex: 1; border: 0; background: none; padding: 13px 0; font-size: 17px; min-width: 0; }
+.search input:focus { outline: none; }
+.tabs { display: flex; gap: 8px; overflow-x: auto; padding: 16px 2px 6px; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: none; display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 999px; border: 2px solid var(--line);
+  background: transparent; font-weight: 600; font-size: 15px; white-space: nowrap;
+}
+.tab-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--mc); }
+.tab-n { background: var(--mc); color: var(--mi); border-radius: 999px; padding: 0 7px; font-size: 13px; }
+.tab[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 12px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 15px 8px 12px; border-radius: 999px;
+  border: 2px solid var(--line); background: var(--surface); font-size: 16px; font-weight: 500;
+  transition: transform .15s ease;
+}
+.chip:active { transform: scale(.96); }
+.chip[aria-pressed="true"] {
+  background: var(--mc); color: var(--mi); border-color: transparent; font-weight: 600;
+  box-shadow: 0 3px 0 rgb(0 0 0 / .2);
+}
+.chip.add { border-style: dashed; border-color: var(--accent); color: var(--ink); }
+.chips-empty { color: var(--muted); margin: 6px 0; }
+
+/* ---------- Results ---------- */
+.results { padding: 40px 0 10px; scroll-margin-top: 80px; }
+.results-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px 24px; margin-bottom: 22px; }
+.results-head h2 { margin: 0; font-size: clamp(1.6rem, 3.6vw, 2.3rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+.results-note { margin: 6px 0 0; color: var(--muted); max-width: 60ch; }
+.results-note button { margin-left: 4px; }
+.seg { display: inline-flex; border: 2px solid var(--line); border-radius: 999px; padding: 3px; background: var(--surface); }
+.seg button { border: 0; background: none; padding: 7px 14px; border-radius: 999px; font-weight: 600; font-size: 15px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 30px 22px; }
+.card { position: relative; min-width: 0; }
+.card-media { aspect-ratio: 20 / 19; border-radius: 18px; overflow: hidden; background: var(--surface-2); }
+.card-media img { width: 100%; height: 100%; object-fit: cover; }
+.card-hit { position: absolute; inset: 0; z-index: 1; background: none; border: 0; border-radius: 18px; }
+.badge {
+  position: absolute; top: 12px; left: 12px; z-index: 2; pointer-events: none;
+  background: var(--surface); color: var(--ink); font-weight: 600; font-size: 14px;
+  padding: 5px 11px; border-radius: 999px; box-shadow: 0 2px 10px rgb(0 0 0 / .18);
+}
+.badge.all { background: var(--accent); color: var(--on-accent); }
+.heart { position: absolute; top: 8px; right: 8px; z-index: 2; width: 44px; height: 44px; border: 0; background: none; display: grid; place-items: center; }
+.heart svg { width: 28px; height: 28px; fill: rgb(0 0 0 / .45); stroke: #fff; stroke-width: 2.5; transition: transform .2s ease; }
+.heart[aria-pressed="true"] svg { fill: var(--accent); }
+.heart:active svg { transform: scale(.85); }
+.card h3 { margin: 12px 0 2px; font-size: 17px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+.uses { margin: 0; color: var(--muted); font-size: 15px; }
+.more-wrap { display: flex; justify-content: center; padding: 30px 0 0; }
+
+.emoji-art { width: 100%; height: 100%; display: grid; place-items: center; background: linear-gradient(140deg, var(--a1), var(--a2)); }
+.emoji-art span { font-size: clamp(64px, 30%, 110px); filter: drop-shadow(0 8px 10px rgb(0 0 0 / .25)); }
+
+.skel .card-media, .skel .bar { background: var(--surface-2); animation: pulse 1.2s ease-in-out infinite alternate; }
+.skel .bar { height: 14px; border-radius: 7px; margin-top: 12px; width: 75%; }
+.skel .bar + .bar { width: 50%; margin-top: 8px; }
+@keyframes pulse { to { opacity: .5; } }
+
+.foot { color: var(--muted); font-size: 14px; padding: 48px 0 140px; }
+
+/* ---------- Bottom action bar ---------- */
+.cta {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; pointer-events: none;
+  display: flex; justify-content: center;
+  padding: 12px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+}
+.cta-inner {
+  pointer-events: auto; display: flex; align-items: center; gap: 8px;
+  background: var(--ink); color: var(--bg); border-radius: 999px; padding: 7px 7px 7px 20px;
+  box-shadow: 0 14px 30px -12px rgb(0 0 0 / .5); max-width: 100%;
+}
+.cta-count { font-weight: 600; font-size: 15px; white-space: nowrap; margin-right: 4px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 46px; padding: 10px 20px; border-radius: 999px; border: 2px solid transparent;
+  font-weight: 600; font-size: 16px; text-decoration: none; white-space: nowrap;
+}
+.btn.primary { background: var(--accent); color: var(--on-accent); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.on-dark { background: transparent; color: var(--bg); border-color: color-mix(in srgb, var(--bg) 35%, transparent); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+/* ---------- Drawers ---------- */
+.scrim { position: fixed; inset: 0; z-index: 40; background: rgb(0 0 0 / .45); opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+.scrim.show { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; bottom: 0; left: 0; z-index: 50; width: min(360px, 88vw);
+  background: var(--surface); color: var(--ink); overflow-y: auto;
+  padding: calc(18px + env(safe-area-inset-top, 0px)) 20px calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-105%); transition: transform .32s cubic-bezier(.2,.8,.2,1);
+  box-shadow: 0 0 40px rgb(0 0 0 / .25); display: flex; flex-direction: column;
+}
+.drawer.right { left: auto; right: 0; width: min(400px, 92vw); transform: translateX(105%); }
+.drawer.open { transform: none; }
+.drawer-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.drawer-head h2 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+.drawer-sub { margin: 18px 0 10px; font-size: 15px; font-weight: 600; color: var(--muted); }
+.swatches { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.swatch {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  padding: 12px; border-radius: 16px; border: 2px solid var(--line); background: var(--bg); text-align: left;
+  font-weight: 600; font-size: 15px;
+}
+.swatch[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.dots { display: flex; }
+.dots i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--surface); margin-right: -6px; }
+.menu-list { display: flex; flex-direction: column; gap: 6px; }
+.menu-item {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  padding: 12px 14px; border-radius: 14px; border: 0; background: var(--bg); font-weight: 600; font-size: 16px;
+}
+.menu-item:disabled { opacity: .45; cursor: not-allowed; }
+.menu-item .n { margin-left: auto; color: var(--muted); }
+.drawer-note { margin-top: auto; padding-top: 24px; color: var(--muted); font-size: 14px; }
+
+.saved { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+.saved-item { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center; }
+.saved-thumb { width: 64px; height: 64px; padding: 0; border: 0; border-radius: 14px; overflow: hidden; background: var(--surface-2); }
+.saved-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.saved-thumb .emoji-art span { font-size: 30px; }
+.saved-name { display: block; border: 0; background: none; padding: 0; text-align: left; font-weight: 600; font-size: 16px; line-height: 1.3; }
+.saved-links { display: flex; gap: 14px; margin-top: 4px; font-size: 14px; }
+.saved-links a { color: var(--accent); font-weight: 600; text-underline-offset: 3px; }
+:root[data-theme="tomato"] .saved-links a, :root[data-theme="mango"] .saved-links a { color: var(--ink); }
+.saved-empty { color: var(--muted); }
+.drawer-foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding-top: 20px; }
+
+/* ---------- Dialogs ---------- */
+dialog.sheet {
+  border: 0; padding: 0; border-radius: 26px; background: var(--surface); color: var(--ink);
+  width: min(660px, calc(100vw - 24px)); max-height: calc(100dvh - 40px); overflow: auto;
+  box-shadow: 0 30px 80px -20px rgb(0 0 0 / .6);
+}
+dialog.sheet::backdrop { background: rgb(0 0 0 / .5); }
+dialog.sheet[open] { animation: rise .3s cubic-bezier(.2,.8,.2,1); }
+@keyframes rise { from { transform: translateY(24px); opacity: 0; } }
+.m-hero { position: relative; aspect-ratio: 16 / 10; background: var(--surface-2); }
+.m-hero img, .m-hero .emoji-art { width: 100%; height: 100%; object-fit: cover; }
+.m-close {
+  position: absolute; top: 12px; right: 12px; width: 42px; height: 42px; border-radius: 50%;
+  border: 0; background: var(--surface); color: var(--ink); font-size: 22px; line-height: 1;
+  box-shadow: 0 4px 14px rgb(0 0 0 / .25);
+}
+.m-body { padding: 22px 24px 8px; }
+.m-body h2 { margin: 0; font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.tag { padding: 4px 12px; border-radius: 999px; background: var(--surface-2); font-size: 14px; font-weight: 600; }
+.have { margin-top: 18px; }
+.meter { height: 10px; border-radius: 5px; background: var(--surface-2); overflow: hidden; }
+.meter span { display: block; height: 100%; background: var(--accent-2); border-radius: 5px; }
+.have p { margin: 8px 0 0; color: var(--muted); }
+.have strong { color: var(--ink); }
+.ings { list-style: none; margin: 18px 0 0; padding: 0; columns: 2 220px; column-gap: 24px; }
+.ings li { break-inside: avoid; display: flex; gap: 10px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.ings .st { flex: none; width: 20px; height: 20px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 12px; font-weight: 800; transform: translateY(3px); }
+.ings .yes .st { background: var(--accent-2); color: var(--surface); }
+.ings .basic .st { background: var(--surface-2); color: var(--muted); }
+.ings .no .st { border: 2px solid var(--line); }
+.ings .meas { color: var(--muted); font-size: 15px; margin-left: auto; text-align: right; padding-left: 8px; }
+.legend { color: var(--muted); font-size: 14px; margin: 10px 0 0; }
+details.steps { margin: 20px 0 6px; border-radius: 16px; background: var(--bg); padding: 4px 16px; }
+details.steps summary { cursor: pointer; font-weight: 600; padding: 10px 0; }
+details.steps p { margin: 0 0 12px; max-width: 70ch; }
+.m-actions {
+  position: sticky; bottom: 0; display: flex; flex-wrap: wrap; gap: 10px;
+  padding: 16px 24px calc(18px + env(safe-area-inset-bottom, 0px));
+  background: var(--surface); border-top: 1px solid var(--line);
+}
+.m-msg { padding: 40px 24px; color: var(--muted); }
+
+.spin-body { padding: 26px 24px 0; text-align: center; }
+.spin-kicker { margin: 0 0 16px; font-weight: 600; color: var(--muted); }
+.reel { width: min(280px, 70vw); aspect-ratio: 1; margin: 0 auto; border-radius: 24px; overflow: hidden; background: var(--surface-2); position: relative; }
+.reel img, .reel .emoji-art { width: 100%; height: 100%; object-fit: cover; }
+.reel.landed { animation: land .5s cubic-bezier(.3,1.6,.5,1); box-shadow: 0 0 0 5px var(--accent); }
+@keyframes land { from { transform: scale(.85); } }
+.spin-name { margin: 18px auto 6px; font-size: 26px; font-weight: 800; line-height: 1.15; min-height: 2.3em; max-width: 20ch; }
+.spin .m-actions { justify-content: center; border-top: 0; }
+.burst { position: absolute; left: 50%; top: 50%; pointer-events: none; font-size: 28px; animation: burst .9s ease-out forwards; }
+@keyframes burst { to { transform: translate(var(--dx), var(--dy)) rotate(var(--r)); opacity: 0; } }
+
+@media (max-width: 640px) {
+  dialog.sheet { width: 100%; max-width: 100%; margin: auto 0 0; border-radius: 26px 26px 0 0; max-height: 92dvh; }
+  .fridge { padding-right: 40px; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 24px 14px; }
+  .card h3 { font-size: 16px; }
+  .badge { font-size: 12px; padding: 4px 9px; top: 9px; left: 9px; }
+  .cta-count { display: none; }
+  .cta-inner { padding-left: 7px; }
+}
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 60;
+  transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+  background: var(--accent-2); color: var(--surface); font-weight: 600;
+  padding: 10px 18px; border-radius: 999px; transition: all .25s ease; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <button class="icon-btn" id="menuBtn" aria-label="Open menu" aria-controls="menu" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+  </button>
+  <a class="brand" href="#top"><span aria-hidden="true">🍽️</span><span>What's for dinner?</span></a>
+  <button class="icon-btn" id="listBtn" aria-label="Open my recipe list" aria-controls="listPanel" aria-expanded="false">
+    <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" aria-hidden="true"><path d="M16 27c6.6-4.4 12-9.4 12-15.6A6.4 6.4 0 0 0 16 8.3a6.4 6.4 0 0 0-12 3.1C4 17.6 9.4 22.6 16 27z"/></svg>
+    <span class="count" id="listCount" hidden>0</span>
+  </button>
+</header>
+
+<main class="wrap" id="top">
+  <section class="hero">
+    <h1>What's in your kitchen?</h1>
+    <p class="lede">Tap what you've got in the fridge and pantry. You'll get dinners that use it, and if nobody can decide, spin for one.</p>
+  </section>
+
+  <section class="fridge" aria-labelledby="fridgeTitle">
+    <div class="fridge-head">
+      <h2 id="fridgeTitle">On the fridge <span class="n" id="fridgeCount"></span></h2>
+      <button class="text-btn" id="clearBtn" hidden>Clear all</button>
+    </div>
+    <div class="magnets" id="magnets" aria-live="polite"></div>
+  </section>
+
+  <section class="picker" aria-label="Choose ingredients">
+    <label class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span class="sr-only">Search or add an ingredient</span>
+      <input id="search" type="search" placeholder="Search or add an ingredient" autocomplete="off" enterkeyhint="done">
+    </label>
+    <div class="tabs" id="tabs" role="group" aria-label="Ingredient groups"></div>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <section class="results" id="results" hidden aria-live="polite">
+    <div class="results-head">
+      <div>
+        <h2 id="resultsTitle"></h2>
+        <p class="results-note" id="resultsNote"></p>
+      </div>
+      <div class="seg" role="group" aria-label="Sort recipes">
+        <button data-sort="match" aria-pressed="true">Best match</button>
+        <button data-sort="az" aria-pressed="false">A to Z</button>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="more-wrap"><button class="btn ghost" id="moreBtn" hidden>Show more dinners</button></div>
+  </section>
+
+  <footer class="foot">Recipes and photos from <a href="https://www.themealdb.com" target="_blank" rel="noopener">TheMealDB</a>. Your picks, list and theme are saved in this browser.</footer>
+</main>
+
+<div class="cta">
+  <div class="cta-inner">
+    <span class="cta-count" id="ctaCount">Pick a few items</span>
+    <button class="btn on-dark" id="spinBtn" disabled><span aria-hidden="true">🎲</span> Spin</button>
+    <button class="btn primary" id="findBtn" disabled>Find dinners</button>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<aside class="drawer" id="menu" aria-label="Menu" aria-hidden="true" inert>
+  <div class="drawer-head">
+    <h2>Menu</h2>
+    <button class="icon-btn small" data-close-drawer aria-label="Close menu">×</button>
+  </div>
+  <h3 class="drawer-sub">Theme</h3>
+  <div class="swatches" id="swatches"></div>
+  <h3 class="drawer-sub">Your stuff</h3>
+  <div class="menu-list">
+    <button class="menu-item" id="menuList"><span aria-hidden="true">♥</span> My recipe list <span class="n" id="menuListCount">0</span></button>
+    <button class="menu-item" id="menuSpin" disabled><span aria-hidden="true">🎲</span> Spin for dinner</button>
+    <button class="menu-item" id="menuClear"><span aria-hidden="true">🧽</span> Clear the fridge</button>
+  </div>
+  <p class="drawer-note">Recipes come from TheMealDB. Your picks, list and theme stay in this browser only.</p>
+</aside>
+
+<aside class="drawer right" id="listPanel" aria-label="My recipe list" aria-hidden="true" inert>
+  <div class="drawer-head">
+    <h2>My recipe list</h2>
+    <button class="icon-btn small" data-close-drawer aria-label="Close list">×</button>
+  </div>
+  <ul class="saved" id="savedList"></ul>
+  <div class="drawer-foot" id="listFoot">
+    <button class="btn ghost" id="copyList">Copy list</button>
+    <button class="btn ghost" id="downloadList">Download</button>
+    <button class="text-btn" id="clearList">Clear list</button>
+  </div>
+</aside>
+
+<dialog class="sheet" id="recipeDlg" aria-label="Recipe details"></dialog>
+
+<dialog class="sheet spin" id="spinDlg" aria-label="Spin for dinner">
+  <div class="spin-body">
+    <p class="spin-kicker" id="spinKicker">Spinning…</p>
+    <div class="reel" id="reel"></div>
+    <h2 class="spin-name" id="spinName"></h2>
+  </div>
+  <div class="m-actions">
+    <button class="btn primary" id="spinOpen" disabled>Show me the recipe</button>
+    <button class="btn ghost" id="spinAgain" disabled>Spin again</button>
+    <button class="btn ghost" data-close>Close</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const API = 'https://www.themealdb.com/api/json/v1/1/';
+
+  /* ---------- Data ---------- */
+  const CATS = [
+    { id: 'protein', name: 'Proteins', m: 1 },
+    { id: 'fridge',  name: 'Dairy and eggs', m: 4 },
+    { id: 'produce', name: 'Veggies and fruit', m: 3 },
+    { id: 'pantry',  name: 'Pantry', m: 2 },
+    { id: 'spice',   name: 'Herbs and spices', m: 5 },
+    { id: 'custom',  name: 'Your extras', m: 4 },
+  ];
+
+  // [id, name, emoji, category, TheMealDB ingredient names]
+  const ITEMS = [
+    ['chicken', 'Chicken', '🍗', 'protein', ['chicken', 'chicken_breast', 'chicken_thighs']],
+    ['mince', 'Ground beef', '🍔', 'protein', ['minced_beef']],
+    ['beef', 'Steak', '🥩', 'protein', ['beef']],
+    ['pork', 'Pork', '🐖', 'protein', ['pork']],
+    ['bacon', 'Bacon', '🥓', 'protein', ['bacon']],
+    ['sausage', 'Sausages', '🌭', 'protein', ['sausages']],
+    ['lamb', 'Lamb', '🍖', 'protein', ['lamb']],
+    ['salmon', 'Salmon', '🐟', 'protein', ['salmon']],
+    ['shrimp', 'Shrimp', '🦐', 'protein', ['prawns', 'king_prawns']],
+    ['whitefish', 'White fish', '🐠', 'protein', ['cod', 'white_fish']],
+    ['tuna', 'Tuna', '🥫', 'protein', ['tuna']],
+    ['tofu', 'Tofu', '🥡', 'protein', ['tofu']],
+
+    ['eggs', 'Eggs', '🥚', 'fridge', ['eggs', 'egg']],
+    ['milk', 'Milk', '🥛', 'fridge', ['milk']],
+    ['butter', 'Butter', '🧈', 'fridge', ['butter']],
+    ['cheddar', 'Cheddar', '🧀', 'fridge', ['cheddar_cheese']],
+    ['parmesan', 'Parmesan', '🧀', 'fridge', ['parmesan', 'parmesan_cheese']],
+    ['mozzarella', 'Mozzarella', '🧀', 'fridge', ['mozzarella', 'mozzarella_balls']],
+    ['cream', 'Cream', '🍶', 'fridge', ['double_cream', 'single_cream']],
+    ['yogurt', 'Yogurt', '🥣', 'fridge', ['greek_yogurt', 'yogurt']],
+
+    ['onion', 'Onion', '🧅', 'produce', ['onion', 'onions', 'red_onions']],
+    ['garlic', 'Garlic', '🧄', 'produce', ['garlic', 'garlic_clove']],
+    ['tomato', 'Tomatoes', '🍅', 'produce', ['tomatoes', 'cherry_tomatoes']],
+    ['potato', 'Potatoes', '🥔', 'produce', ['potatoes']],
+    ['sweetpotato', 'Sweet potato', '🍠', 'produce', ['sweet_potatoes']],
+    ['carrot', 'Carrots', '🥕', 'produce', ['carrots']],
+    ['mushroom', 'Mushrooms', '🍄', 'produce', ['mushrooms']],
+    ['spinach', 'Spinach', '🥬', 'produce', ['spinach']],
+    ['broccoli', 'Broccoli', '🥦', 'produce', ['broccoli']],
+    ['pepper', 'Bell pepper', '🫑', 'produce', ['red_pepper', 'green_pepper']],
+    ['zucchini', 'Zucchini', '🥒', 'produce', ['courgettes']],
+    ['lemon', 'Lemon or lime', '🍋', 'produce', ['lemon', 'lemons', 'lime']],
+    ['avocado', 'Avocado', '🥑', 'produce', ['avocado']],
+    ['ginger', 'Ginger', '🫚', 'produce', ['ginger']],
+
+    ['rice', 'Rice', '🍚', 'pantry', ['rice', 'basmati_rice', 'long_grain_rice']],
+    ['pasta', 'Pasta', '🍝', 'pantry', ['spaghetti', 'penne_rigate', 'pasta']],
+    ['noodles', 'Noodles', '🍜', 'pantry', ['noodles', 'egg_noodles', 'rice_noodles']],
+    ['bread', 'Bread', '🍞', 'pantry', ['bread']],
+    ['flour', 'Flour', '🌾', 'pantry', ['flour', 'plain_flour']],
+    ['cantom', 'Canned tomatoes', '🥫', 'pantry', ['chopped_tomatoes']],
+    ['chickpeas', 'Chickpeas', '🫘', 'pantry', ['chickpeas']],
+    ['beans', 'Beans', '🫘', 'pantry', ['kidney_beans', 'black_beans']],
+    ['lentils', 'Lentils', '🫘', 'pantry', ['red_lentils', 'green_lentils', 'lentils']],
+    ['coconut', 'Coconut milk', '🥥', 'pantry', ['coconut_milk']],
+    ['soy', 'Soy sauce', '🍶', 'pantry', ['soy_sauce']],
+    ['honey', 'Honey', '🍯', 'pantry', ['honey']],
+
+    ['paprika', 'Paprika', '🌶️', 'spice', ['paprika']],
+    ['chili', 'Chili', '🌶️', 'spice', ['chilli_powder', 'red_chilli']],
+    ['curry', 'Curry powder', '🍛', 'spice', ['curry_powder']],
+    ['cumin', 'Cumin', '🧂', 'spice', ['cumin']],
+    ['basil', 'Basil', '🌿', 'spice', ['basil', 'basil_leaves']],
+    ['cilantro', 'Cilantro', '🌿', 'spice', ['coriander', 'coriander_leaves']],
+    ['parsley', 'Parsley', '🌿', 'spice', ['parsley']],
+    ['thyme', 'Thyme', '🌿', 'spice', ['thyme']],
+  ].map(([id, name, emoji, cat, terms]) => ({ id, name, emoji, cat, terms }));
+
+  // Built-in ideas used when the recipe database can't be reached
+  const LOCAL = [
+    ['Garlic butter shrimp pasta', '🍤', ['shrimp', 'pasta', 'garlic', 'butter', 'lemon', 'parsley']],
+    ['Chicken fried rice', '🍚', ['chicken', 'rice', 'eggs', 'carrot', 'soy', 'onion']],
+    ['Shakshuka', '🍳', ['eggs', 'cantom', 'onion', 'garlic', 'pepper', 'paprika']],
+    ['Beef tacos', '🌮', ['mince', 'onion', 'cheddar', 'tomato', 'chili']],
+    ['Mushroom risotto', '🍄', ['rice', 'mushroom', 'onion', 'parmesan', 'butter']],
+    ['Chickpea coconut curry', '🍛', ['chickpeas', 'coconut', 'onion', 'garlic', 'curry', 'cantom']],
+    ['Lemon garlic baked salmon', '🐟', ['salmon', 'lemon', 'garlic', 'butter']],
+    ['Spaghetti carbonara', '🍝', ['pasta', 'eggs', 'bacon', 'parmesan']],
+    ['Veggie stir-fry noodles', '🍜', ['noodles', 'broccoli', 'carrot', 'pepper', 'soy', 'garlic', 'ginger']],
+    ['Loaded baked potatoes', '🥔', ['potato', 'cheddar', 'bacon', 'yogurt']],
+    ['Sheet pan chicken and veg', '🍗', ['chicken', 'potato', 'carrot', 'onion', 'paprika']],
+    ['Red lentil soup', '🥣', ['lentils', 'carrot', 'onion', 'garlic', 'cumin', 'cantom']],
+    ['Margherita flatbread', '🍕', ['flour', 'mozzarella', 'tomato', 'basil']],
+    ['Honey soy tofu bowl', '🥡', ['tofu', 'rice', 'soy', 'honey', 'ginger', 'broccoli']],
+    ['Spinach and cheese omelette', '🥚', ['eggs', 'spinach', 'cheddar', 'milk']],
+    ['Sweet potato black bean chili', '🌶️', ['sweetpotato', 'beans', 'onion', 'chili', 'cumin', 'cantom']],
+    ['Crispy lemon fish and potatoes', '🐠', ['whitefish', 'lemon', 'parsley', 'butter', 'potato']],
+    ['Honey garlic pork', '🐖', ['pork', 'honey', 'garlic', 'soy', 'rice']],
+    ['Tuna melt', '🥪', ['tuna', 'bread', 'cheddar', 'onion']],
+    ['Sausage and pepper pasta', '🌭', ['sausage', 'pasta', 'pepper', 'onion', 'cantom']],
+    ['Lamb kofta with yogurt sauce', '🍢', ['lamb', 'onion', 'cumin', 'yogurt', 'parsley']],
+    ['Creamy chicken and mushrooms', '🍲', ['chicken', 'mushroom', 'cream', 'garlic', 'thyme']],
+    ['Zucchini fritters', '🥒', ['zucchini', 'eggs', 'flour', 'parmesan']],
+    ['Steak with garlic butter potatoes', '🥩', ['beef', 'butter', 'garlic', 'thyme', 'potato']],
+    ['Avocado toast with a fried egg', '🥑', ['avocado', 'bread', 'eggs', 'lemon', 'chili']],
+    ['Cilantro lime chicken rice bowl', '🌯', ['chicken', 'rice', 'cilantro', 'lemon', 'beans', 'avocado']],
+  ].map(([name, emoji, needs], i) => ({ id: 'l' + i, name, emoji, needs, src: 'local' }));
+
+  const THEMES = [
+    { id: 'auto', name: 'Match my device', dots: ['#D13A25', '#FF6FA8', '#15131F'] },
+    { id: 'tomato', name: 'Tomato', dots: ['#D13A25', '#FFB020', '#1F8F81'] },
+    { id: 'avocado', name: 'Avocado', dots: ['#2F7A22', '#A4C639', '#F2C14E'] },
+    { id: 'blueberry', name: 'Blueberry', dots: ['#5B3FD9', '#2563EB', '#FF7AA0'] },
+    { id: 'mango', name: 'Mango', dots: ['#F28C00', '#FFC93C', '#D6336C'] },
+    { id: 'midnight', name: 'Midnight snack', dots: ['#FF6FA8', '#4FD1C5', '#FFD166'] },
+  ];
+
+  const BASICS = ['salt', 'pepper', 'black pepper', 'water', 'olive oil', 'oil', 'vegetable oil', 'sunflower oil', 'sugar', 'cold water', 'sea salt'];
+
+  /* ---------- Storage (safe if blocked) ---------- */
+  const store = {
+    get(k, fb) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* ignore */ } },
+  };
+
+  /* ---------- State ---------- */
+  const state = {
+    selected: new Set(store.get('wfd-selected', [])),
+    custom: store.get('wfd-custom', []),
+    cat: 'all',
+    query: '',
+    results: [],
+    shown: 24,
+    sort: 'match',
+    mode: 'live',
+    searchedCount: 0,
+    list: store.get('wfd-list', []),
+    details: new Map(),
+    searchId: 0,
+    openId: null,
+    lastAdded: null,
+    spinning: false,
+    spinPick: null,
+  };
+
+  /* ---------- Helpers ---------- */
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const allItems = () => ITEMS.concat(state.custom);
+  const getItem = (id) => allItems().find((i) => i.id === id);
+  const catOf = (id) => CATS.find((c) => c.id === id) || CATS[0];
+  const mStyle = (cat) => `--mc:var(--m${cat.m});--mi:var(--m${cat.m}-ink)`;
+  const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const googleURL = (name) => 'https://www.google.com/search?q=' + encodeURIComponent(name + ' recipe');
+  const allrecipesURL = (name) => 'https://www.allrecipes.com/search?q=' + encodeURIComponent(name);
+  const isSaved = (id) => state.list.some((e) => e.id === id);
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+  function hash(str) { let h = 0; for (const ch of str) h = (h * 31 + ch.charCodeAt(0)) | 0; return Math.abs(h); }
+  function artHTML(name, emoji) {
+    const h = hash(name); const a = (h % 5) + 1; const b = ((h >> 3) % 5) + 1;
+    const b2 = b === a ? (a % 5) + 1 : b;
+    return `<div class="emoji-art" style="--a1:var(--m${a});--a2:var(--m${b2})"><span aria-hidden="true">${emoji || '🍽️'}</span></div>`;
+  }
+  function mediaHTML(r) {
+    return r.thumb ? `<img src="${esc(r.thumb)}" alt="" loading="lazy">` : artHTML(r.name, r.emoji);
+  }
+
+  async function getJSON(url) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10000);
+    try {
+      const res = await fetch(url, { signal: ctrl.signal });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.json();
+    } finally { clearTimeout(timer); }
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function savePicks() {
+    store.set('wfd-selected', [...state.selected]);
+    store.set('wfd-custom', state.custom);
+  }
+
+  /* ---------- Theme ---------- */
+  function applyTheme(id) {
+    if (id === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', id);
+    store.set('wfd-theme', id);
+    renderSwatches(id);
+  }
+  function renderSwatches(current) {
+    $('#swatches').innerHTML = THEMES.map((t) => `
+      <button class="swatch" data-theme-id="${t.id}" aria-pressed="${t.id === current}">
+        <span class="dots" aria-hidden="true">${t.dots.map((d) => `<i style="background:${d}"></i>`).join('')}</span>
+        ${esc(t.name)}
+      </button>`).join('');
+  }
+
+  /* ---------- Picker ---------- */
+  function countSel(catId) { return [...state.selected].filter((id) => getItem(id)?.cat === catId).length; }
+
+  function renderTabs() {
+    if (state.cat === 'custom' && !state.custom.length) state.cat = 'all';
+    const cats = CATS.filter((c) => c.id !== 'custom' || state.custom.length);
+    $('#tabs').innerHTML =
+      `<button class="tab" data-cat="all" aria-pressed="${state.cat === 'all'}">All</button>` +
+      cats.map((c) => {
+        const n = countSel(c.id);
+        return `<button class="tab" data-cat="${c.id}" aria-pressed="${state.cat === c.id}" style="${mStyle(c)}">
+          <span class="tab-dot" aria-hidden="true"></span>${esc(c.name)}${n ? ` <span class="tab-n">${n}</span>` : ''}</button>`;
+      }).join('');
+  }
+
+  function renderChips() {
+    const raw = state.query.trim();
+    const q = raw.toLowerCase();
+    const items = allItems().filter((i) => q ? i.name.toLowerCase().includes(q) : (state.cat === 'all' || i.cat === state.cat));
+    let html = items.map((i) => `
+      <button class="chip" data-item="${i.id}" aria-pressed="${state.selected.has(i.id)}" style="${mStyle(catOf(i.cat))}">
+        <span aria-hidden="true">${i.emoji}</span>${esc(i.name)}
+      </button>`).join('');
+    if (q && !allItems().some((i) => i.name.toLowerCase() === q)) {
+      html += `<button class="chip add" data-add="${esc(raw)}">＋ Add “${esc(raw)}”</button>`;
+    }
+    $('#chips').innerHTML = html || '<p class="chips-empty">Nothing here yet.</p>';
+  }
+
+  function renderFridge() {
+    const sel = [...state.selected].map(getItem).filter(Boolean);
+    const tilts = [-3, 2, -1.5, 3, -2, 1.5, -2.5, 1];
+    $('#fridgeCount').textContent = sel.length ? `(${sel.length})` : '';
+    $('#clearBtn').hidden = !sel.length;
+    $('#magnets').innerHTML = sel.length
+      ? sel.map((i, n) => `
+        <button class="magnet${i.id === state.lastAdded ? ' pop' : ''}" data-item="${i.id}"
+          style="${mStyle(catOf(i.cat))};--tilt:${tilts[n % tilts.length]}deg" aria-label="Remove ${esc(i.name)}">
+          <span aria-hidden="true">${i.emoji}</span>${esc(i.name)}<span class="x" aria-hidden="true">×</span>
+        </button>`).join('')
+      : '<p class="fridge-empty">Nothing on the fridge yet. Tap ingredients below to stick them here.</p>';
+    state.lastAdded = null;
+  }
+
+  function updateCTA() {
+    const n = state.selected.size;
+    $('#ctaCount').textContent = n ? `${n} picked` : 'Pick a few items';
+    $('#findBtn').disabled = !n;
+    $('#spinBtn').disabled = !state.results.length;
+    $('#menuSpin').disabled = !state.results.length;
+  }
+
+  function renderPicker() { renderTabs(); renderChips(); renderFridge(); updateCTA(); }
+
+  function toggleItem(id) {
+    if (state.selected.has(id)) state.selected.delete(id);
+    else { state.selected.add(id); state.lastAdded = id; }
+    savePicks(); renderPicker();
+  }
+
+  function addCustom(raw) {
+    const name = raw.trim().replace(/\s+/g, ' ');
+    if (!name) return;
+    const existing = allItems().find((i) => i.name.toLowerCase() === name.toLowerCase());
+    if (existing) { state.selected.add(existing.id); state.lastAdded = existing.id; }
+    else {
+      const slug = name.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim().replace(/ +/g, '_');
+      if (!slug) return;
+      const item = { id: 'c-' + slug, name: name[0].toUpperCase() + name.slice(1), emoji: '🛒', cat: 'custom', terms: [slug] };
+      state.custom.push(item); state.selected.add(item.id); state.lastAdded = item.id;
+    }
+    state.query = ''; $('#search').value = '';
+    savePicks(); renderPicker();
+    toast(`Added ${name} to the fridge`);
+  }
+
+  function clearFridge() {
+    state.selected.clear(); savePicks(); renderPicker();
+    toast('Fridge cleared');
+  }
+
+  /* ---------- Finding recipes ---------- */
+  function selectedItems() { return [...state.selected].map(getItem).filter(Boolean); }
+
+  function showLoading() {
+    const sec = $('#results'); sec.hidden = false;
+    $('#resultsTitle').textContent = 'Looking for dinners…';
+    $('#resultsNote').textContent = '';
+    $('#moreBtn').hidden = true;
+    $('#grid').innerHTML = Array.from({ length: 8 }, () =>
+      '<div class="card skel" aria-hidden="true"><div class="card-media"></div><div class="bar"></div><div class="bar"></div></div>').join('');
+    sec.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
+  }
+
+  async function findDinners() {
+    const items = selectedItems();
+    if (!items.length) { toast('Pick at least one ingredient first'); return; }
+    const myId = ++state.searchId;
+    showLoading();
+
+    const map = new Map();
+    let ok = 0;
+    const jobs = [];
+    for (const it of items) {
+      for (const term of it.terms) {
+        jobs.push(getJSON(API + 'filter.php?i=' + encodeURIComponent(term)).then((d) => {
+          ok++;
+          (d && d.meals || []).forEach((m) => {
+            let e = map.get(m.idMeal);
+            if (!e) { e = { id: m.idMeal, name: m.strMeal, thumb: m.strMealThumb, matched: new Set(), src: 'mdb' }; map.set(m.idMeal, e); }
+            e.matched.add(it.id);
+          });
+        }).catch(() => {}));
+      }
+    }
+    await Promise.all(jobs);
+    if (myId !== state.searchId) return; // a newer search started
+
+    state.searchedCount = items.length;
+    if (ok === 0) {
+      state.mode = 'offline';
+      state.results = LOCAL.map((r) => ({ ...r, matched: new Set(r.needs.filter((n) => state.selected.has(n))) }))
+        .filter((r) => r.matched.size > 0)
+        .sort((a, b) => b.matched.size - a.matched.size || (a.needs.length - a.matched.size) - (b.needs.length - b.matched.size));
+    } else {
+      state.mode = 'live';
+      state.results = [...map.values()].sort((a, b) => b.matched.size - a.matched.size || a.name.localeCompare(b.name));
+    }
+    state.shown = 24;
+    renderResults(); updateCTA();
+  }
+
+  function sortedResults() {
+    const r = [...state.results];
+    if (state.sort === 'az') r.sort((a, b) => a.name.localeCompare(b.name));
+    return r;
+  }
+
+  function cardHTML(r) {
+    const n = r.matched.size;
+    const all = n === state.searchedCount && n > 1;
+    const names = [...r.matched].map((id) => getItem(id)?.name.toLowerCase()).filter(Boolean);
+    const uses = names.slice(0, 3).join(', ') + (names.length > 3 ? ` and ${names.length - 3} more` : '');
+    return `
+      <article class="card">
+        <div class="card-media">${mediaHTML(r)}</div>
+        <button class="card-hit" data-open="${esc(r.id)}" aria-label="Open ${esc(r.name)}"></button>
+        <span class="badge${all ? ' all' : ''}">${all ? 'Uses everything you picked' : `Uses ${n} of yours`}</span>
+        <button class="heart" data-save="${esc(r.id)}" aria-pressed="${isSaved(r.id)}" aria-label="Save ${esc(r.name)} to my list">
+          <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 27c6.6-4.4 12-9.4 12-15.6A6.4 6.4 0 0 0 16 8.3a6.4 6.4 0 0 0-12 3.1C4 17.6 9.4 22.6 16 27z"/></svg>
+        </button>
+        <h3>${esc(r.name)}</h3>
+        <p class="uses">Uses ${esc(uses)}</p>
+      </article>`;
+  }
+
+  function renderResults() {
+    const r = sortedResults();
+    const note = $('#resultsNote');
+    $('#results').hidden = false;
+    if (!r.length) {
+      $('#resultsTitle').textContent = 'No dinners found for that mix';
+      note.textContent = 'Try adding a main ingredient like chicken, rice, pasta or eggs.';
+      $('#grid').innerHTML = ''; $('#moreBtn').hidden = true;
+      return;
+    }
+    $('#resultsTitle').textContent = `${plural(r.length, 'dinner', 'dinners')} you can make`;
+    note.innerHTML = state.mode === 'offline'
+      ? 'The recipe database didn\u2019t respond, so these are built-in ideas with links to recipe sites. <button class="text-btn" id="retryBtn">Try again</button>'
+      : 'Sorted by how many of your ingredients each recipe uses. Tap a card for details.';
+    $('#grid').innerHTML = r.slice(0, state.shown).map(cardHTML).join('');
+    $('#moreBtn').hidden = state.shown >= r.length;
+  }
+
+  /* ---------- Recipe details ---------- */
+  function selectedTerms() {
+    const out = [];
+    selectedItems().forEach((i) => {
+      out.push(i.name.toLowerCase());
+      i.terms.forEach((t) => out.push(t.replace(/_/g, ' ')));
+    });
+    return out;
+  }
+  function ingredientStatus(name, terms) {
+    const n = name.toLowerCase().trim();
+    if (BASICS.includes(n)) return 'basic';
+    const has = terms.some((t) => n.includes(t) || (n.length >= 4 && t.includes(n)));
+    return has ? 'yes' : 'no';
+  }
+  const findAny = (id) => state.results.find((r) => r.id === id) || state.list.find((e) => e.id === id);
+
+  async function getDetail(id) {
+    if (state.details.has(id)) return state.details.get(id);
+    const d = await getJSON(API + 'lookup.php?i=' + encodeURIComponent(id));
+    const m = d && d.meals && d.meals[0];
+    if (!m) throw new Error('Not found');
+    state.details.set(id, m);
+    return m;
+  }
+
+  function saveBtnHTML(id) {
+    const s = isSaved(id);
+    return `<button class="btn ghost" data-save="${esc(id)}" aria-pressed="${s}">${s ? '♥ Saved' : '♡ Save to my list'}</button>`;
+  }
+
+  function ingListHTML(list) {
+    const icon = { yes: '✓', basic: '·', no: '' };
+    return `<ul class="ings">${list.map((g) => `
+      <li class="${g.st}"><span class="st" aria-hidden="true">${icon[g.st]}</span>
+        <span>${esc(g.name)}<span class="sr-only"> (${g.st === 'yes' ? 'you have this' : g.st === 'basic' ? 'kitchen basic' : 'need to get'})</span></span>
+        ${g.measure ? `<span class="meas">${esc(g.measure)}</span>` : ''}</li>`).join('')}</ul>
+      <p class="legend">✓ you have it, · kitchen basic, ○ you'd need to get it</p>`;
+  }
+
+  function haveHTML(list) {
+    const need = list.filter((g) => g.st !== 'basic');
+    const have = need.filter((g) => g.st === 'yes').length;
+    const pct = need.length ? Math.round((have / need.length) * 100) : 0;
+    const missing = need.length - have;
+    return `<div class="have">
+      <div class="meter" aria-hidden="true"><span style="width:${pct}%"></span></div>
+      <p><strong>You have ${have} of ${need.length} ingredients.</strong> ${missing ? `${plural(missing, 'thing', 'things')} to pick up.` : 'You can make this right now.'}</p>
+    </div>`;
+  }
+
+  async function openRecipe(id) {
+    const r = findAny(id);
+    if (!r) return;
+    const dlg = $('#recipeDlg');
+    state.openId = id;
+    const close = '<button class="m-close" data-close aria-label="Close">×</button>';
+
+    if (r.src === 'local') {
+      const terms = selectedTerms();
+      const list = r.needs.map((n) => {
+        const it = getItem(n);
+        return { name: it ? it.name : n, measure: '', st: state.selected.has(n) ? 'yes' : ingredientStatus(it ? it.name : n, terms) };
+      });
+      dlg.innerHTML = `
+        <div class="m-hero">${artHTML(r.name, r.emoji)}${close}</div>
+        <div class="m-body"><h2>${esc(r.name)}</h2>${haveHTML(list)}${ingListHTML(list)}</div>
+        <div class="m-actions">
+          <a class="btn primary" href="${allrecipesURL(r.name)}" target="_blank" rel="noopener">Find it on Allrecipes</a>
+          <a class="btn ghost" href="${googleURL(r.name)}" target="_blank" rel="noopener">Search the web</a>
+          ${saveBtnHTML(id)}
+        </div>`;
+      if (!dlg.open) dlg.showModal();
+      dlg.scrollTop = 0;
+      return;
+    }
+
+    dlg.innerHTML = `<div class="m-hero">${mediaHTML(r)}${close}</div>
+      <div class="m-body"><h2>${esc(r.name)}</h2></div><p class="m-msg">Loading the recipe…</p>`;
+    if (!dlg.open) dlg.showModal();
+    dlg.scrollTop = 0;
+
+    try {
+      const m = await getDetail(id);
+      if (state.openId !== id || !dlg.open) return;
+      const terms = selectedTerms();
+      const list = [];
+      for (let i = 1; i <= 20; i++) {
+        const name = (m['strIngredient' + i] || '').trim();
+        if (!name) continue;
+        list.push({ name, measure: (m['strMeasure' + i] || '').trim(), st: ingredientStatus(name, terms) });
+      }
+      const steps = (m.strInstructions || '').split(/\r?\n+/).map((s) => s.trim()).filter(Boolean);
+      const url = m.strSource || googleURL(m.strMeal);
+      dlg.innerHTML = `
+        <div class="m-hero"><img src="${esc(m.strMealThumb)}" alt="${esc(m.strMeal)}">${close}</div>
+        <div class="m-body">
+          <h2>${esc(m.strMeal)}</h2>
+          <div class="tags">${m.strCategory ? `<span class="tag">${esc(m.strCategory)}</span>` : ''}${m.strArea && m.strArea !== 'Unknown' ? `<span class="tag">${esc(m.strArea)}</span>` : ''}</div>
+          ${haveHTML(list)}
+          ${ingListHTML(list)}
+          ${steps.length ? `<details class="steps"><summary>Show the steps</summary>${steps.map((s) => `<p>${esc(s)}</p>`).join('')}</details>` : ''}
+        </div>
+        <div class="m-actions">
+          <a class="btn primary" href="${esc(url)}" target="_blank" rel="noopener">${m.strSource ? 'Open full recipe' : 'Search for this recipe'}</a>
+          ${m.strYoutube ? `<a class="btn ghost" href="${esc(m.strYoutube)}" target="_blank" rel="noopener">Watch video</a>` : ''}
+          ${saveBtnHTML(id)}
+        </div>`;
+      // Keep any saved entry's links up to date
+      const saved = state.list.find((e) => e.id === id);
+      if (saved && m.strSource && saved.url !== m.strSource) { saved.url = m.strSource; saved.video = m.strYoutube || ''; persistList(); }
+    } catch (e) {
+      if (state.openId !== id) return;
+      dlg.querySelector('.m-msg').innerHTML =
+        `Couldn\u2019t load this recipe. Check your connection, or <a href="${googleURL(r.name)}" target="_blank" rel="noopener">search for it on the web</a>.`;
+    }
+  }
+
+  /* ---------- Saved list ---------- */
+  function persistList() { store.set('wfd-list', state.list); renderList(); }
+
+  async function toggleSave(id) {
+    if (isSaved(id)) {
+      state.list = state.list.filter((e) => e.id !== id);
+      toast('Removed from your list');
+    } else {
+      const r = findAny(id);
+      if (!r) return;
+      const entry = { id: r.id, name: r.name, thumb: r.thumb || '', emoji: r.emoji || '', src: r.src };
+      if (r.src === 'local') { entry.url = allrecipesURL(r.name); entry.video = ''; entry.needs = r.needs; }
+      else {
+        const m = state.details.get(id);
+        entry.url = (m && m.strSource) || googleURL(r.name);
+        entry.video = (m && m.strYoutube) || '';
+      }
+      state.list.unshift(entry);
+      toast('Saved to your list');
+      if (r.src === 'mdb' && !state.details.has(id)) {
+        getDetail(id).then((m) => {
+          const e = state.list.find((x) => x.id === id);
+          if (e) { e.url = m.strSource || e.url; e.video = m.strYoutube || ''; persistList(); }
+        }).catch(() => {});
+      }
+    }
+    persistList();
+    syncSaveButtons(id);
+  }
+
+  function syncSaveButtons(id) {
+    const s = isSaved(id);
+    document.querySelectorAll('[data-save]').forEach((b) => {
+      if (b.dataset.save !== id) return;
+      b.setAttribute('aria-pressed', s);
+      if (b.classList.contains('btn')) b.textContent = s ? '♥ Saved' : '♡ Save to my list';
+    });
+  }
+
+  function renderList() {
+    const n = state.list.length;
+    const badge = $('#listCount');
+    badge.textContent = n; badge.hidden = !n;
+    $('#menuListCount').textContent = n;
+    $('#listFoot').hidden = !n;
+    $('#savedList').innerHTML = n
+      ? state.list.map((e) => `
+        <li class="saved-item">
+          <button class="saved-thumb" data-open="${esc(e.id)}" aria-label="Open ${esc(e.name)}">${mediaHTML(e)}</button>
+          <div>
+            <button class="saved-name" data-open="${esc(e.id)}">${esc(e.name)}</button>
+            <div class="saved-links">
+              <a href="${esc(e.url)}" target="_blank" rel="noopener">Recipe site</a>
+              ${e.video ? `<a href="${esc(e.video)}" target="_blank" rel="noopener">Video</a>` : ''}
+            </div>
+          </div>
+          <button class="icon-btn small" data-remove="${esc(e.id)}" aria-label="Remove ${esc(e.name)}">×</button>
+        </li>`).join('')
+      : '<li class="saved-empty">Tap the heart on any recipe to add it here. Your list keeps the links to each full recipe.</li>';
+  }
+
+  function listText() {
+    return "What's for dinner: my recipe list\n\n" +
+      state.list.map((e, i) => `${i + 1}. ${e.name}\n   ${e.url}${e.video ? `\n   Video: ${e.video}` : ''}`).join('\n\n') + '\n';
+  }
+
+  async function copyList() {
+    const text = listText();
+    try { await navigator.clipboard.writeText(text); }
+    catch (e) {
+      const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (err) { /* ignore */ }
+      ta.remove();
+    }
+    toast('List copied');
+  }
+
+  function downloadList() {
+    const blob = new Blob([listText()], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'dinner-list.txt';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  /* ---------- Spin game ---------- */
+  function weightedPick(pool) {
+    const total = pool.reduce((s, r) => s + r.matched.size ** 2, 0);
+    let x = Math.random() * total;
+    for (const r of pool) { x -= r.matched.size ** 2; if (x <= 0) return r; }
+    return pool[pool.length - 1];
+  }
+
+  function showOnReel(r) {
+    $('#reel').innerHTML = r.thumb ? `<img src="${esc(r.thumb)}" alt="">` : artHTML(r.name, r.emoji);
+    $('#spinName').textContent = r.name;
+  }
+
+  function spin() {
+    const pool = state.results;
+    if (!pool.length || state.spinning) { if (!pool.length) toast('Find dinners first, then spin'); return; }
+    closeDrawers(false);
+    const dlg = $('#spinDlg');
+    if (!dlg.open) dlg.showModal();
+    state.spinning = true;
+    const pick = weightedPick(pool);
+    state.spinPick = pick;
+    const reel = $('#reel');
+    reel.classList.remove('landed');
+    $('#spinKicker').textContent = 'Spinning…';
+    $('#spinOpen').disabled = true; $('#spinAgain').disabled = true;
+
+    const land = () => {
+      showOnReel(pick);
+      void reel.offsetWidth;
+      reel.classList.add('landed');
+      $('#spinKicker').textContent = 'Tonight you\u2019re having';
+      $('#spinOpen').disabled = false; $('#spinAgain').disabled = false;
+      state.spinning = false;
+      if (!reduceMotion()) {
+        ['🎉', '✨', '🍴', '⭐', '🎉', '✨', '🥳', '⭐'].forEach((em, i) => {
+          const s = document.createElement('span');
+          s.className = 'burst'; s.textContent = em;
+          const ang = (i / 8) * Math.PI * 2;
+          s.style.setProperty('--dx', Math.cos(ang) * 140 + 'px');
+          s.style.setProperty('--dy', Math.sin(ang) * 140 + 'px');
+          s.style.setProperty('--r', (Math.random() * 120 - 60) + 'deg');
+          reel.appendChild(s);
+          setTimeout(() => s.remove(), 1000);
+        });
+      }
+    };
+
+    if (reduceMotion() || pool.length === 1) { land(); return; }
+    let delay = 55; let last = null;
+    const tick = () => {
+      if (!dlg.open) { state.spinning = false; return; }
+      let r; do { r = pool[Math.floor(Math.random() * pool.length)]; } while (pool.length > 1 && r === last);
+      last = r; showOnReel(r);
+      delay *= 1.15;
+      if (delay < 420) setTimeout(tick, delay); else setTimeout(land, delay);
+    };
+    tick();
+  }
+
+  /* ---------- Drawers ---------- */
+  let drawerTrigger = null;
+  function openDrawer(el, trigger) {
+    closeDrawers(false);
+    el.classList.add('open'); el.removeAttribute('inert'); el.setAttribute('aria-hidden', 'false');
+    $('#scrim').classList.add('show');
+    drawerTrigger = trigger || null;
+    if (trigger) trigger.setAttribute('aria-expanded', 'true');
+    const first = el.querySelector('button, a'); if (first) first.focus();
+  }
+  function closeDrawers(restoreFocus = true) {
+    document.querySelectorAll('.drawer').forEach((d) => {
+      d.classList.remove('open'); d.setAttribute('inert', ''); d.setAttribute('aria-hidden', 'true');
+    });
+    $('#scrim').classList.remove('show');
+    ['#menuBtn', '#listBtn'].forEach((s) => $(s).setAttribute('aria-expanded', 'false'));
+    if (restoreFocus && drawerTrigger) drawerTrigger.focus();
+    drawerTrigger = null;
+  }
+  const anyDrawerOpen = () => !!document.querySelector('.drawer.open');
+
+  /* ---------- Events ---------- */
+  $('#tabs').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-cat]'); if (!b) return;
+    state.cat = b.dataset.cat; state.query = ''; $('#search').value = '';
+    renderTabs(); renderChips();
+  });
+  $('#chips').addEventListener('click', (e) => {
+    const add = e.target.closest('[data-add]'); if (add) { addCustom(add.dataset.add); return; }
+    const b = e.target.closest('[data-item]'); if (b) toggleItem(b.dataset.item);
+  });
+  $('#magnets').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-item]'); if (b) toggleItem(b.dataset.item);
+  });
+  $('#search').addEventListener('input', (e) => { state.query = e.target.value; renderChips(); });
+  $('#search').addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const q = state.query.trim().toLowerCase(); if (!q) return;
+    const matches = allItems().filter((i) => i.name.toLowerCase().includes(q));
+    const exact = allItems().find((i) => i.name.toLowerCase() === q);
+    if (exact) { if (!state.selected.has(exact.id)) toggleItem(exact.id); state.query = ''; e.target.value = ''; renderChips(); }
+    else if (matches.length === 1) { if (!state.selected.has(matches[0].id)) toggleItem(matches[0].id); state.query = ''; e.target.value = ''; renderChips(); }
+    else addCustom(state.query);
+  });
+  $('#clearBtn').addEventListener('click', clearFridge);
+  $('#findBtn').addEventListener('click', findDinners);
+  $('#spinBtn').addEventListener('click', spin);
+  $('#moreBtn').addEventListener('click', () => { state.shown += 24; renderResults(); });
+  $('#resultsNote').addEventListener('click', (e) => { if (e.target.id === 'retryBtn') findDinners(); });
+
+  document.querySelector('.seg').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-sort]'); if (!b) return;
+    state.sort = b.dataset.sort;
+    document.querySelectorAll('.seg button').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    renderResults();
+  });
+
+  $('#grid').addEventListener('click', (e) => {
+    const s = e.target.closest('[data-save]'); if (s) { toggleSave(s.dataset.save); return; }
+    const o = e.target.closest('[data-open]'); if (o) openRecipe(o.dataset.open);
+  });
+
+  const recipeDlg = $('#recipeDlg');
+  recipeDlg.addEventListener('click', (e) => {
+    if (e.target === recipeDlg || e.target.closest('[data-close]')) { recipeDlg.close(); return; }
+    const s = e.target.closest('[data-save]'); if (s) toggleSave(s.dataset.save);
+  });
+  recipeDlg.addEventListener('close', () => { state.openId = null; });
+
+  const spinDlg = $('#spinDlg');
+  spinDlg.addEventListener('click', (e) => {
+    if (e.target === spinDlg || e.target.closest('[data-close]')) spinDlg.close();
+  });
+  $('#spinAgain').addEventListener('click', spin);
+  $('#spinOpen').addEventListener('click', () => {
+    const pick = state.spinPick; spinDlg.close();
+    if (pick) openRecipe(pick.id);
+  });
+
+  $('#menuBtn').addEventListener('click', (e) => openDrawer($('#menu'), e.currentTarget));
+  $('#listBtn').addEventListener('click', (e) => openDrawer($('#listPanel'), e.currentTarget));
+  $('#scrim').addEventListener('click', () => closeDrawers());
+  document.querySelectorAll('[data-close-drawer]').forEach((b) => b.addEventListener('click', () => closeDrawers()));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && anyDrawerOpen()) closeDrawers(); });
+
+  $('#swatches').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-theme-id]'); if (b) applyTheme(b.dataset.themeId);
+  });
+  $('#menuList').addEventListener('click', () => openDrawer($('#listPanel'), $('#listBtn')));
+  $('#menuSpin').addEventListener('click', spin);
+  $('#menuClear').addEventListener('click', () => { clearFridge(); closeDrawers(); });
+
+  $('#savedList').addEventListener('click', (e) => {
+    const rm = e.target.closest('[data-remove]'); if (rm) { toggleSave(rm.dataset.remove); return; }
+    const o = e.target.closest('[data-open]'); if (o) { closeDrawers(false); openRecipe(o.dataset.open); }
+  });
+  $('#copyList').addEventListener('click', copyList);
+  $('#downloadList').addEventListener('click', downloadList);
+  $('#clearList').addEventListener('click', () => {
+    if (!confirm('Remove every recipe from your list?')) return;
+    const ids = state.list.map((x) => x.id);
+    state.list = []; persistList(); ids.forEach(syncSaveButtons);
+    toast('List cleared');
+  });
+
+  /* ---------- Start ---------- */
+  state.selected.forEach((id) => { if (!getItem(id)) state.selected.delete(id); });
+  applyTheme(store.get('wfd-theme', 'auto'));
+  renderPicker();
+  renderList();
+})();
+</script>
+</body>
+</html>
